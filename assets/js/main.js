@@ -1,54 +1,50 @@
-import * as THREE from "./threejs/r120/three.module.js";
-import { GLTFLoader } from "./threejs/GLTFLoader.js";
+// Create layers
+var iframeLayers = [null, null, null, null];
 
-// Create scene
-var scene = new THREE.Scene();
+setInterval(() => {
+  // Randomly toggle a frame
+  layerId = Math.floor((Math.random() * 3.99));
+  console.log(`Toggle layer ${layerId}`);
+  toggleLayer(layerId);
 
-// Add lighting
-var ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
-scene.add(ambientLight);
-var pointLight = new THREE.PointLight(0xffffff, 0.85);
-scene.add(pointLight);
+}, 6000 /* 20 seconds */);
 
-var camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
-
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// var geometry = new THREE.BoxGeometry();
-// var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-var mesh;
-
-var loader = new GLTFLoader();
-
-loader.load(
-  "../assets/models/duck.gltf",
-  function (gltf) {
-    mesh = gltf.scene.children[0]
-    scene.add(mesh);
-    mesh.position.z = -5;
-  },
-  // called while loading is progressing
-  function (xhr) {
-    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-  },
-  function (error) {
-    console.error(error);
+function toggleLayer(layerId) {
+  if (iframeLayers[layerId] === null) {
+    // Layer is off!
+    turnLayerOn(layerId);
+  } else {
+    // Layer is on!
+    turnLayerOff(layerId);
   }
-);
-
-function animate() {
-  requestAnimationFrame( animate );
-  if (mesh) {
-    // mesh.rotation.x += 0.001;
-    mesh.rotation.y += 0.01;
-    }
-  renderer.render( scene, camera );
 }
-animate();
+
+function turnLayerOn(layerId) {
+  iframeLayers[layerId] = document.createElement('iframe');
+  iframeLayers[layerId].setAttribute('src', './assets/html/layer.html');
+  iframeLayers[layerId].setAttribute('width', `${window.innerWidth * 0.75}px`);
+  iframeLayers[layerId].setAttribute('height', `${window.innerHeight * 0.75}px`);
+  iframeLayers[layerId].setAttribute('scrolling', `no`);
+  switch (layerId) {
+    case 0:
+      iframeLayers[layerId].setAttribute('style', `position:absolute;top:0;left:0`);
+      break;
+    case 1:
+      iframeLayers[layerId].setAttribute('style', `position:absolute;top:0;right:0`);
+      break;
+    case 2:
+      iframeLayers[layerId].setAttribute('style', `position:absolute;bottom:0;left:0`);
+      break;
+    case 3:
+      iframeLayers[layerId].setAttribute('style', `position:absolute;bottom:0;right:0`);
+      break;
+  }
+  document.body.appendChild(iframeLayers[layerId]);
+}
+
+function turnLayerOff() {
+  iframeLayers[layerId].setAttribute('src', '');
+  iframeLayers[layerId].removeAttribute('src');
+  document.body.removeChild(iframeLayers[layerId]);
+  iframeLayers[layerId] = null;  // Mark for GC??
+}

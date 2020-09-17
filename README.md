@@ -2,7 +2,7 @@
 
 ## Local server development
 
-Install light weight node server
+Install light-weight node server
 
 ```
 npm install http-server -g
